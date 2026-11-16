@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>振動センサ リアルタイム</title>
+<style>
+  body { margin: 0; padding: 16px; background: #111; color: #eee; font-family: sans-serif; }
+  h1 { font-size: 18px; margin: 0 0 4px; }
+  #info { font: 13px monospace; margin-bottom: 8px; color: #aaa; }
+  #main { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+  #left { flex: 0 0 360px; }
+  #right { flex: 1 1 480px; min-width: 0; }
+  h2 { font-size: 14px; margin: 0 0 4px; color: #aaa; font-weight: normal; }
+  table { border-collapse: collapse; width: 100%; font: 13px monospace; }
+  th, td { padding: 2px 8px; text-align: right; border-bottom: 1px solid #2a2a2a; }
+  th { color: #888; position: sticky; top: 0; background: #111; }
+  button { font-size: 14px; padding: 4px 14px; margin-right: 6px; }
+  button:disabled { opacity: .4; }
+  #counter { font-size: 15px; margin: 4px 0 8px; }
+  #counter b { font-size: 26px; color: #fc4; }
+  #counter2 { font-size: 15px; margin: 0 0 8px; }
+  #counter2 b { font-size: 26px; color: #6cf; }
+  input[type=range] { vertical-align: middle; width: 220px; }
+  canvas { width: 100%; height: 60vh; background: #1a1a1a; display: block; }
+</style>
+</head>
+<body>
+<h1>振動センサ リアルタイム（ADXL345・800Hz）</h1>
+<div id="ctl"><button id="play">▶ 再生</button><button id="stop">■ ストップ</button>　表示: <button id="mg">g表示</button><button id="mq">0・弱・中・強</button><button id="me">変化量</button></div>
+<div id="info"><span id="st">接続中…</span>　受信 <b id="hz">0</b> Hz　現在の大きさ <b id="mag">-</b> g</div>
+<div id="counter">弱以上の打鍵 <b id="cnt">0</b> 回　（弱 <span id="c1">0</span>・中 <span id="c2">0</span>・強 <span id="c3">0</span>）　<button id="rc">カウンタをリセット</button></div>
+<div id="counter2">変化量版の打鍵 <b id="ecnt">0</b> 回　補正 k = <span id="kv">5.0</span> <input type="range" id="ks" min="2" max="10" step="0.5" value="5">　まとめる間隔 <span id="gv">50</span> ms <input type="range" id="gs" min="10" max="60" step="5" value="50">　<span id="est"></span>　<button id="rcal">再校正</button></div>
+<div id="main">
+  <div id="left">
+    <h2>CSV に追加される行（新しい順）</h2>
+    <table>
+      <thead><tr><th>seq</th><th>t_s</th><th>x_g</th><th>y_g</th><th>z_g</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+  <div id="right">
+    <h2 id="ttl"></h2>
+    <canvas id="c"></canvas>
+  </div>
+</div>
+<script>
+const KEEP = 4000, ROWS = 30;                       // 波形は5秒分(800Hz)、表は直近30行
+const TH = [0.13, 0.20, 0.30];                      // 0 / 弱 / 中 / 強 の境[g]。0.13g 以下はノイズとして0に丸める
+const NAMES = ["0", "弱", "中", "強"];
+const mag = [], last = [];                          // 波形用の値(大きさ)、表用の行
+let base = 1;                                       // 基準（直近5秒の中央値。静止時の大きさ）
+let count = 0, dirty = false, nextSeq = 0;
+const post = p => fetch(p, { method: "POST" });
+document.getElementById("play").onclick = () => post("/run");
+document.getElementById("stop").onclick = () => post("/stop");
+let mode = "q";                                     // "g" = g表示、"q" = 0・弱・中・強、"e" = 変化量
+const TITLES = {
+  g: "振動の大きさ √(x²+y²+z²) − 基準[g]（基準 = 直近5秒の中央値・直近5秒）",
+  q: "振動の強さ（|√(x²+y²+z²) − 基準| を 0 / 弱 / 中 / 強 に量子化・直近5秒）",
+  e: "変化量E（急な変化の大きさ・直近5秒）と、しきい値（点線）。しきい値は、スライドバーのkで変わる",
+};
+function setMode(m) {
+  mode = m;
+  for (const k of ["g", "q", "e"]) document.getElementById("m" + k).disabled = m === k;
+  document.getElementById("ttl").textContent = TITLES[m];
+}
+document.getElementById("mg").onclick = () => setMode("g");
+document.getElementById("mq").onclick = () => setMode("q");
+document.getElementById("me").onclick = () => setMode("e");
+setMode("q");
+setMode("q");
+
+// ---- 弱以上の打鍵を数えるカウンタ ----
+// 「弱」以上になった点が、50ms以内につながっていれば、1回の打鍵と数える(余韻で何度も数えない)。
+// 開いた直後・記録をやり直した直後の1秒は、基準が安定しないので数えない。
+const GAP = 40, WARM = 800;
+let tally = [0, 0, 0, 0], inEv = false, evMax = 0, lastAbove = -1e9, seen = 0;   // tally[1]=弱、[2]=中、[3]=強(その打鍵の最大の段階)
+function showCount() {
+  const t = tally.slice(); if (inEv) t[evMax]++;
+  document.getElementById("cnt").textContent = t[1] + t[2] + t[3];
+  for (const k of [1, 2, 3]) document.getElementById("c" + k).textContent = t[k];
+}
+function resetCount() { tally = [0, 0, 0, 0]; inEv = false; evMax = 0; lastAbove = -1e9; seen = 0; showCount(); eStart = ebase + Eh.length; recountE(); }
+function feed(idx, v) {
+  if (inEv && idx - lastAbove > GAP) { tally[evMax]++; inEv = false; }
+  if (++seen <= WARM) return;
+  const L = level(v);
+  if (L >= 1) { if (!inEv) { inEv = true; evMax = L; } else if (L > evMax) evMax = L; lastAbove = idx; }
+}
+document.getElementById("rc").onclick = resetCount;
+
+// ---- 変化量版のカウンタ(kのスライドバーでしきい値を変える) ----
+// 変化量E = 前のサンプルとの差を、静止時のノイズで割り、3軸ぶんを足して、12サンプルで合計したもの。
+// 開いた直後・記録をやり直した直後の2秒(触らない時間)で、静止時のノイズの大きさを決める(校正)。
+// しきい値 = 静止時のEの平均 + k × 標準偏差。Eがしきい値を超えた点が「まとめる間隔」以内につながっていれば、1回と数える(間隔は、スライドバーで変える)。
+const CAL = 1600, WE = 12, EMAX = 400000;
+let ek = 5, egap = 40, prev = null, cal = null, sig = null, emu = 0, esd = 1, thrE = 0;
+let ring = [], rsum = 0, Eh = [], ebase = 0, eStart = 0, eIn = false, eLast = -1e9, eEvents = 0;
+const sdOf = a => { const m = a.reduce((s, v) => s + v, 0) / a.length; return Math.sqrt(a.reduce((s, v) => s + (v - m) * (v - m), 0) / a.length); };
+function resetE() { prev = null; cal = [[], [], []]; sig = null; ring = []; rsum = 0; Eh = []; ebase = 0; eStart = 0; eIn = false; eLast = -1e9; eEvents = 0; showE(); }
+function updateThr() { thrE = emu + ek * esd; }
+function eStep(idx, e) {                              // 1サンプルぶんのEで、数える
+  if (eIn && idx - eLast > egap) eIn = false;
+  if (idx < eStart) return;
+  if (e > thrE) { if (!eIn) { eIn = true; eEvents++; } eLast = idx; }
+}
+function recountE() {                                 // kを変えたとき、保存してあるEから数え直す
+  eIn = false; eLast = -1e9; eEvents = 0;
+  for (let i = 0; i < Eh.length; i++) eStep(ebase + i, Eh[i]);
+  showE();
+}
+function showE() {
+  document.getElementById("ecnt").textContent = eEvents;
+  document.getElementById("kv").textContent = ek.toFixed(1);
+  document.getElementById("gv").textContent = Math.round(egap / 0.8);
+  document.getElementById("est").textContent = sig ? `校正済み（しきい値 ${thrE.toFixed(0)}）`
+    : cal ? `校正中…触らないで（残り ${Math.max(0, (CAL - cal[0].length) / 800).toFixed(1)} 秒）` : "";
+}
+function finishCal() {
+  sig = cal.map(sdOf);
+  const s = cal[0].map((_, i) => (cal[0][i] / sig[0]) ** 2 + (cal[1][i] / sig[1]) ** 2 + (cal[2][i] / sig[2]) ** 2);
+  const Es = []; let r = 0;
+  s.forEach((v, i) => { r += v; if (i >= WE) r -= s[i - WE]; if (i >= WE - 1) Es.push(r); });
+  emu = Es.reduce((a, b) => a + b, 0) / Es.length; esd = sdOf(Es);
+  ring = s.slice(-WE); rsum = ring.reduce((a, b) => a + b, 0);
+  cal = null; updateThr();
+}
+function feedE(x, y, z) {
+  if (prev) {
+    const d = [x - prev[0], y - prev[1], z - prev[2]];
+    if (!sig) { d.forEach((v, i) => cal[i].push(v)); if (cal[0].length >= CAL) finishCal(); }
+    else {
+      const v = (d[0] / sig[0]) ** 2 + (d[1] / sig[1]) ** 2 + (d[2] / sig[2]) ** 2;
+      ring.push(v); rsum += v; if (ring.length > WE) rsum -= ring.shift();
+      Eh.push(rsum); eStep(ebase + Eh.length - 1, rsum);
+      if (Eh.length > EMAX) { Eh.splice(0, EMAX / 4); ebase += EMAX / 4; recountE(); }   // 古い分を捨てる(約8分より前)
+    }
+  }
+  prev = [x, y, z];
+}
+const ks = document.getElementById("ks");
+ks.oninput = () => { ek = parseFloat(ks.value); updateThr(); recountE(); };
+const gs = document.getElementById("gs");
+gs.oninput = () => { egap = Math.round(parseFloat(gs.value) * 0.8); recountE(); };   // ms → サンプル数(800Hz)
+document.getElementById("rcal").onclick = resetE;
+resetE();
+
+const es = new EventSource("/stream");
+es.onerror = () => document.getElementById("st").textContent = "切断（再接続中…）";
+es.onmessage = e => {
+  const m = JSON.parse(e.data);
+  document.getElementById("play").disabled = m.run;
+  document.getElementById("stop").disabled = !m.run;
+  document.getElementById("st").textContent = m.run ? "記録中" : "停止中";
+  if (m.first < nextSeq) { mag.length = 0; last.length = 0; dirty = true; resetCount(); resetE(); }   // 再生し直したので、画面をクリア
+  nextSeq = m.first + m.x.length;
+  for (let i = 0; i < m.x.length; i++) {
+    mag.push(Math.hypot(m.x[i], m.y[i], m.z[i]));
+    feed(m.first + i, mag[mag.length - 1]);
+    feedE(m.x[i], m.y[i], m.z[i]);
+    last.push([m.first + i, (m.first + i) / m.rate, m.x[i], m.y[i], m.z[i]]);
+  }
+  if (mag.length > KEEP) mag.splice(0, mag.length - KEEP);
+  if (last.length > ROWS) last.splice(0, last.length - ROWS);
+  showCount(); showE(); count += m.x.length; dirty = true;
+};
+
+setInterval(() => {
+  document.getElementById("hz").textContent = count; count = 0;
+  const v = mag[mag.length - 1];
+  document.getElementById("mag").textContent = v === undefined ? "-" : v.toFixed(3);
+}, 1000);
+setInterval(() => { if (mag.length) base = mag.slice().sort((a, b) => a - b)[mag.length >> 1]; }, 500);
+const level = v => { const d = Math.abs(v - base); return d <= TH[0] ? 0 : d <= TH[1] ? 1 : d <= TH[2] ? 2 : 3; };
+
+const tbody = document.getElementById("rows");
+function drawTable() {
+  tbody.innerHTML = last.slice().reverse().map(r =>
+    `<tr><td>${r[0]}</td><td>${r[1].toFixed(5)}</td><td>${r[2].toFixed(4)}</td><td>${r[3].toFixed(4)}</td><td>${r[4].toFixed(4)}</td></tr>`).join("");
+}
+
+const cv = document.getElementById("c"), ctx = cv.getContext("2d");
+let erange = 100;                                   // 変化量表示の縦軸の上限(自動で変える)
+let range = 0.2;                                    // g表示の縦軸 ±range g（振動の大きさに合わせて自動で変える）
+function drawWave() {
+  const w = cv.width = cv.clientWidth, h = cv.height = cv.clientHeight;
+  ctx.strokeStyle = "#333"; ctx.fillStyle = "#888"; ctx.font = "14px sans-serif";
+  if (mode === "e") {
+    const E = Eh.slice(-KEEP);
+    const peakE = E.reduce((m, v) => Math.max(m, v), 0);
+    erange += (Math.max(thrE * 1.5, peakE * 1.1, 10) - erange) * 0.1;
+    const y = v => h - 20 - v / erange * (h - 40);
+    for (const f of [0, 0.25, 0.5, 0.75, 1]) { const v = f * erange; ctx.beginPath(); ctx.moveTo(0, y(v)); ctx.lineTo(w, y(v)); ctx.stroke(); ctx.fillText(v.toFixed(0), 4, y(v) - 2); }
+    ctx.strokeStyle = "#6cf"; ctx.beginPath();
+    E.forEach((v, i) => { const px = (i + KEEP - E.length) / KEEP * w; i ? ctx.lineTo(px, y(v)) : ctx.moveTo(px, y(v)); });
+    ctx.stroke();
+    if (sig) {
+      ctx.setLineDash([8, 6]); ctx.strokeStyle = "#f93"; ctx.beginPath(); ctx.moveTo(0, y(thrE)); ctx.lineTo(w, y(thrE)); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = "#f93"; ctx.fillText(`しきい値 (k=${ek.toFixed(1)})`, w - 170, y(thrE) - 6);
+    }
+    return;
+  }
+  if (mode === "g") {
+    const peak = mag.reduce((m, v) => Math.max(m, Math.abs(v - base)), 0);
+    range += (Math.max(0.1, peak * 1.2) - range) * 0.1;
+    const y = g => h / 2 - g / range * h / 2;
+    for (const g of [-range, -range / 2, 0, range / 2, range]) {
+      ctx.beginPath(); ctx.moveTo(0, y(g)); ctx.lineTo(w, y(g)); ctx.stroke();
+      ctx.fillText(g.toFixed(2) + "g", 4, y(g) - 2);
+    }
+    ctx.setLineDash([6, 6]); ctx.strokeStyle = "#555";                  // ノイズの境(±TH[0])
+    for (const g of [TH[0], -TH[0]]) { ctx.beginPath(); ctx.moveTo(0, y(g)); ctx.lineTo(w, y(g)); ctx.stroke(); }
+    ctx.setLineDash([]);
+    ctx.strokeStyle = "#fc4"; ctx.beginPath();
+    mag.forEach((v, i) => { const px = (i + KEEP - mag.length) / KEEP * w; i ? ctx.lineTo(px, y(v - base)) : ctx.moveTo(px, y(v - base)); });
+    ctx.stroke();
+    return;
+  }
+  const y = lv => h - 20 - lv / 3 * (h - 40);
+  for (let lv = 0; lv <= 3; lv++) {
+    ctx.beginPath(); ctx.moveTo(0, y(lv)); ctx.lineTo(w, y(lv)); ctx.stroke();
+    ctx.fillText(NAMES[lv], 6, y(lv) - 4);
+  }
+  ctx.strokeStyle = "#fc4"; ctx.beginPath();
+  mag.forEach((v, i) => { const px = (i + KEEP - mag.length) / KEEP * w; i ? ctx.lineTo(px, y(level(v))) : ctx.moveTo(px, y(level(v))); });
+  ctx.stroke();
+}
+
+function frame() {
+  drawWave();
+  if (dirty) { drawTable(); dirty = false; }
+  requestAnimationFrame(frame);
+}
+frame();
+</script>
+</body>
+</html>
