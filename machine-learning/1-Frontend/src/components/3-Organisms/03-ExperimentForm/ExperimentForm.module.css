@@ -1,34 +1,16 @@
-.form {
-    /* 大きさ設定 */
-    width: 100%;
-
-    /* バックグラウンド設定 */
-    background-color: var(--color-surface);
-
-    /* 要素配置設定 */
-    display: flex;
-    flex-direction: column;
-
-    /* 余白設定 */
-    padding: var(--space-medium);
-    gap: var(--space-medium);
-
-    /* 装飾設定 */
-    border: var(--border-width) solid var(--color-border);
-    border-radius: var(--radius-medium);
-}
-
-.title {
+.note {
     /* 文字設定 */
-    font-size: var(--font-size-large);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
 }
 
 .selectors {
     /* 要素配置設定 */
     display: flex;
+    flex-wrap: wrap;
 
     /* 余白設定 */
-    gap: var(--space-medium);
+    gap: var(--space-4);
 }
 
 .selector {
@@ -37,29 +19,35 @@
     flex-direction: column;
 
     /* 余白設定 */
-    gap: 0.2rem;
+    gap: var(--space-1);
 
     /* 文字設定 */
-    font-size: var(--font-size-small);
+    font-size: var(--font-size-sm);
+}
+
+.hint {
+    /* 文字設定 */
+    color: var(--color-text-muted);
+    font-size: var(--font-size-xs);
 }
 
 .group {
     /* 余白設定 */
-    padding: var(--space-small);
+    padding: var(--space-3);
 
     /* 文字設定 */
-    font-size: var(--font-size-small);
+    font-size: var(--font-size-sm);
 
     /* 装飾設定 */
-    border: var(--border-width) solid var(--color-border);
-    border-radius: var(--radius-medium);
+    border: 1px solid var(--color-border);
 }
 
 .fields {
     /* 要素配置設定 */
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(25%, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
 
     /* 余白設定 */
-    gap: var(--space-small);
+    gap: var(--space-3);
+    margin-top: var(--space-3);
 }

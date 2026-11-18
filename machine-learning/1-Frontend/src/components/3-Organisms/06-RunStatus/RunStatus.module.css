@@ -1,0 +1,10 @@
+.status {
+    /* 要素配置設定 */
+    display: flex;
+
+    /* 配置基準設定 */
+    align-items: center;
+
+    /* 余白設定 */
+    gap: var(--space-4);
+}

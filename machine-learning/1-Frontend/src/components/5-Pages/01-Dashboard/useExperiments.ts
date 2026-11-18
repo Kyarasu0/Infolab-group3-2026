@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 
 import {
-  fetchEvaluationPlans, fetchParameters, fetchRecord, fetchRecords, runExperiment,
-} from "../../../functions/api-client";
+  fetchEvaluationPlans, fetchParameterDescriptions, fetchParameters, fetchRecord, fetchRecords, runExperiment,
+} from "@/functions/api-client";
 import type {
-  EvaluationPlan, ExperimentRecord, JobStatus, ParameterSet, RecordSummary,
-} from "../../../functions/api-types";
+  EvaluationPlan, ExperimentRecord, JobStatus, ParameterDescriptions, ParameterSet, RecordSummary,
+} from "@/functions/api-types";
 
 type ParameterTexts = Record<string, Record<string, string>>;
 
@@ -19,7 +19,8 @@ function toParameterSet(texts: ParameterTexts, defaults: ParameterSet): Paramete
       if (isNumber && (text.trim() === "" || Number.isNaN(Number(text)))) {
         throw new Error(`数値で入力してください: ${model}.${key}`);
       }
-      result[model][key] = isNumber ? Number(text) : text;
+      // 文字の欄では「null」と書くと、値なし(null)になる
+      result[model][key] = isNumber ? Number(text) : text.trim() === "null" ? null : text;
     }
   }
   return result;
@@ -30,6 +31,7 @@ export function useExperiments(
   onError: (message: string | null) => void,
 ) {
   const [plans, setPlans] = useState<EvaluationPlan[]>([]);
+  const [descriptions, setDescriptions] = useState<ParameterDescriptions>({});
   const [scenarioName, setScenarioName] = useState("");
   const [planName, setPlanName] = useState("");
   const [defaults, setDefaults] = useState<ParameterSet>({});
@@ -52,12 +54,13 @@ export function useExperiments(
 
   const reloadRecords = useCallback(() => run(async () => setRecords(await fetchRecords())), [run]);
 
-  // 2. 最初に、評価計画と記録を読む。選択の初期値は先頭にする
+  // 2. 最初に、評価計画・パラメータの説明・記録を読む。選択の初期値は先頭にする
   useEffect(() => {
     run(async () => {
       const loadedPlans = await fetchEvaluationPlans();
       setPlans(loadedPlans);
       setPlanName((current) => current || loadedPlans[0]?.name || "");
+      setDescriptions(await fetchParameterDescriptions());
     });
     reloadRecords();
   }, [run, reloadRecords]);
@@ -101,7 +104,7 @@ export function useExperiments(
   });
 
   return {
-    plans, scenarioName, planName, parameterTexts, note, records, existingRecord,
+    plans, descriptions, scenarioName, planName, parameterTexts, note, records, existingRecord,
     selectedRecordId, recordDetail,
     setScenarioName, setPlanName, setNote, setSelectedRecordId,
     changeParameter: (model: string, key: string, text: string) =>

@@ -93,3 +93,11 @@ export interface RunExperimentRequest {
 export type RunExperimentResponse =
   | { status: "started" }
   | { status: "exists"; record: RecordSummary };
+
+// パラメータの日本語名と説明(モデルごと)
+export interface ParameterDescriptions {
+  [model: string]: {
+    model: { label: string; description: string };
+    parameters: Record<string, { label: string; description: string }>;
+  };
+}

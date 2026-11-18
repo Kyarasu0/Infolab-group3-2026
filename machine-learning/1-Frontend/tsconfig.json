@@ -9,7 +9,8 @@
     "resolveJsonModule": true,
     "noEmit": true,
     "skipLibCheck": true,
-    "types": ["vite/client", "node"]
+    "types": ["vite/client", "node"],
+    "paths": { "@/*": ["./src/*"], "@shared/*": ["../3-Shared/*"] }
   },
   "include": ["src", "vite.config.ts", "../3-Shared/api-list.json", "../3-Shared/concept/*.json"]
 }

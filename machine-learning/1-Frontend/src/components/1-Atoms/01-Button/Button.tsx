@@ -2,6 +2,8 @@ import type { ButtonHTMLAttributes } from "react";
 
 import styles from "./Button.module.css";
 
-export function Button(props: ButtonHTMLAttributes<HTMLButtonElement>) {
-  return <button {...props} className={styles.button} />;
+type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & { primary?: boolean };
+
+export function Button({ primary, className, ...rest }: ButtonProps) {
+  return <button {...rest} className={[styles.button, primary && styles.primary, className].filter(Boolean).join(" ")} />;
 }

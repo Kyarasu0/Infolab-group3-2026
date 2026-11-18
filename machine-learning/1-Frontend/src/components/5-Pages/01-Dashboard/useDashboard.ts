@@ -3,10 +3,8 @@ import { useCallback, useEffect, useState } from "react";
 import {
   changeMode, fetchArchitecture, fetchCurrentJob, fetchMode, fetchResult,
   fetchScenarios, startComparison, startTraining,
-} from "../../../functions/api-client";
-import type {
-  Architecture, JobStatus, Mode, ScenarioResult, ScenarioSummary,
-} from "../../../functions/api-types";
+} from "@/functions/api-client";
+import type { Architecture, JobStatus, Mode, ScenarioResult, ScenarioSummary } from "@/functions/api-types";
 
 const POLLING_INTERVAL_MS = 1000;
 const IDLE_JOB: JobStatus = { state: "idle", autoencoder_loss: [] };
@@ -37,7 +35,7 @@ export function useDashboard() {
     reloadScenarios();
   }, [run, reloadScenarios]);
 
-  // 3. 学習中は、進捗を1秒ごとに取得する。終わったら一覧を更新する
+  // 3. 実行中は、進捗を1秒ごとに取得する。終わったら一覧を更新する
   useEffect(() => {
     if (job.state !== "running") return;
     const timer = setInterval(async () => {
@@ -49,7 +47,13 @@ export function useDashboard() {
     return () => clearInterval(timer);
   }, [job.state, reloadScenarios]);
 
-  // 4. 選んだシナリオの結果と構成を読む(未学習なら空にする)
+  // 4. 何も選んでいなければ、学習済みの最初のシナリオを選ぶ
+  useEffect(() => {
+    const firstTrained = scenarios.find((scenario) => scenario.trained);
+    setSelectedName((current) => current ?? firstTrained?.name ?? null);
+  }, [scenarios]);
+
+  // 5. 選んだシナリオの結果と構成を読む(未学習なら空にする)
   useEffect(() => {
     setResult(null);
     setArchitecture(null);

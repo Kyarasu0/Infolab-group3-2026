@@ -1,47 +1,3 @@
-.history {
-    /* 大きさ設定 */
-    width: 100%;
-
-    /* バックグラウンド設定 */
-    background-color: var(--color-surface);
-
-    /* 要素配置設定 */
-    display: flex;
-    flex-direction: column;
-
-    /* 余白設定 */
-    padding: var(--space-medium);
-    gap: var(--space-medium);
-
-    /* 文字設定 */
-    font-size: var(--font-size-small);
-
-    /* 装飾設定 */
-    border: var(--border-width) solid var(--color-border);
-    border-radius: var(--radius-medium);
-}
-
-.title {
-    /* 文字設定 */
-    font-size: var(--font-size-large);
-}
-
-.subtitle {
-    /* 文字設定 */
-    font-size: var(--font-size-medium);
-}
-
-.table {
-    /* 大きさ設定 */
-    width: 100%;
-
-    /* 文字設定 */
-    text-align: left;
-
-    /* 装飾設定 */
-    border-collapse: collapse;
-}
-
 .row {
     /* 装飾設定 */
     cursor: pointer;
@@ -49,36 +5,26 @@
 
 .selectedRow {
     /* バックグラウンド設定 */
-    background-color: var(--color-background);
+    background-color: var(--color-accent-soft);
 
     /* 装飾設定 */
     cursor: pointer;
 }
 
-.detail {
-    /* 要素配置設定 */
-    display: flex;
-    flex-direction: column;
-
-    /* 余白設定 */
-    gap: var(--space-small);
-}
-
 .parameters {
     /* バックグラウンド設定 */
-    background-color: var(--color-background);
+    background-color: var(--color-bg);
 
     /* 余白設定 */
-    padding: var(--space-small);
-
-    /* 文字設定 */
-    font-size: var(--font-size-small);
+    margin-top: var(--space-3);
+    padding: var(--space-3);
 
     /* 装飾設定 */
-    border-radius: var(--radius-medium);
+    border: 1px solid var(--color-border);
 }
 
-.empty {
+.muted {
     /* 文字設定 */
     color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
 }
