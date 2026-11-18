@@ -1,0 +1,9 @@
+{
+  "latent_dim": 4,
+  "hidden_layers": 2,
+  "epochs": 50,
+  "batch_size": 32,
+  "learning_rate": 0.001,
+  "anomaly_percentile": 95,
+  "seed": 0
+}
