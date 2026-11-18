@@ -1,4 +1,4 @@
-// 画面全体(1枚): ヘッダー → 実行状況 → シナリオ → 実験 → 記録と比較 → 学習曲線とモデルの構成
+// 画面全体(1枚): ヘッダー → 実行状況 → シナリオ → 実験 → 記録 → 比較と学習曲線 → 散布図と誤差の分布 → データの概要 → モデルの構成
 import { useMemo } from "react";
 
 import modes from "@shared/concept/modes.json";
@@ -12,11 +12,15 @@ import { ExistingRecordNotice } from "../../3-Organisms/05-ExistingRecordNotice/
 import { ExperimentForm } from "../../3-Organisms/03-ExperimentForm/ExperimentForm";
 import { RecordHistory } from "../../3-Organisms/04-RecordHistory/RecordHistory";
 import { RunStatus } from "../../3-Organisms/06-RunStatus/RunStatus";
+import { DataSummary } from "../../3-Organisms/10-DataSummary/DataSummary";
+import { ErrorDistributionPanel } from "../../3-Organisms/09-ErrorDistributionPanel/ErrorDistributionPanel";
+import { ScatterPanel } from "../../3-Organisms/08-ScatterPanel/ScatterPanel";
 import { ScenarioPanel } from "../../3-Organisms/01-ScenarioPanel/ScenarioPanel";
 import { AppHeader } from "../../4-Templates/01-AppHeader/AppHeader";
 import styles from "./Dashboard.module.css";
 import { useDashboard } from "./useDashboard";
 import { useExperiments } from "./useExperiments";
+import { useVisuals } from "./useVisuals";
 
 const cx = bind(layout, styles);
 
@@ -24,6 +28,7 @@ export function Dashboard() {
   const dashboard = useDashboard();
   const scenarioNames = useMemo(() => dashboard.scenarios.map((scenario) => scenario.name), [dashboard.scenarios]);
   const experiments = useExperiments(scenarioNames, dashboard.job, dashboard.refreshJob, dashboard.setErrorMessage);
+  const visuals = useVisuals(dashboard.selectedName, dashboard.scenarios, dashboard.job);
   const isTrainMode = dashboard.mode === "train";
 
   // 学習中は進捗の損失、そうでなければ選んだシナリオの学習曲線を見せる
@@ -63,6 +68,12 @@ export function Dashboard() {
               series={[{ name: "損失", color: "var(--chart-1)", values: lossValues }]} />
           </Panel>
         </div>
+        <div className={cx("grid2")}>
+          <ScatterPanel scenarioName={dashboard.selectedName} scatter={visuals.scatter.data} message={visuals.scatter.message} />
+          <ErrorDistributionPanel scenarioName={dashboard.selectedName} distribution={visuals.errorDistribution.data}
+            message={visuals.errorDistribution.message} />
+        </div>
+        <DataSummary summary={visuals.dataSummary.data} message={visuals.dataSummary.message} />
         <ArchitectureViewer architecture={dashboard.architecture} />
       </main>
     </>

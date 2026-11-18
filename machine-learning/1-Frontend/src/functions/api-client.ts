@@ -7,8 +7,8 @@
 
 import apiList from "@shared/api-list.json";
 import type {
-  Architecture, EvaluationPlan, ExperimentRecord, JobStatus, Mode, ParameterDescriptions, ParameterSet,
-  RecordSummary, RunExperimentRequest, RunExperimentResponse, ScenarioResult, ScenarioSummary,
+  Architecture, DataSummary, ErrorDistribution, EvaluationPlan, ExperimentRecord, JobStatus, Mode, ParameterDescriptions, ParameterSet,
+  RecordSummary, RunExperimentRequest, RunExperimentResponse, ScatterData, ScenarioResult, ScenarioSummary,
 } from "@/functions/api-types";
 
 // APIの名前から、一覧の項目(メソッドとパス)を探す(なければ例外)
@@ -61,3 +61,7 @@ export const runExperiment = (request: RunExperimentRequest) =>
 export const fetchRecords = () => callApi<RecordSummary[]>("get_experiment_records");
 export const fetchRecord = (recordId: string) =>
   callApi<ExperimentRecord>("get_experiment_record", { record_id: recordId });
+export const fetchScatter = (name: string) => callApi<ScatterData>("get_scenario_scatter", { name });
+export const fetchErrorDistribution = (name: string) =>
+  callApi<ErrorDistribution>("get_scenario_error_distribution", { name });
+export const fetchDataSummary = () => callApi<DataSummary>("get_data_summary");

@@ -16,7 +16,9 @@
 4. 実験: シナリオ・評価計画・パラメータを選んで評価して記録する。**パラメータ欄には、日本語名・設定名・説明が出る**(説明は `models/*/*.descriptions.json`)。同じ条件の記録があれば、「過去の結果を表示 / もう一度実行」を選べる
 5. 実験の記録: 平均 ± 標準偏差の一覧と、foldごとの詳細
 6. シナリオ比較(棒グラフ)と、学習曲線(折れ線)
-7. モデルの構成: 層ごとの入出力・パラメータ数
+7. 散布図(色 = 状態、形 = サブタイプ)と、再構成誤差の分布(閾値つき)。選んだシナリオが学習済みで、データがあるときだけ表示
+8. データの概要: 件数と、特徴量ごとの平均(状態別)
+9. モデルの構成: 層ごとの入出力・パラメータ数
 
 ## 構成
 ```text
@@ -29,20 +31,22 @@ src/
 │   ├── api-types.ts               #   APIの入出力の型
 │   ├── chart-scale.ts             #   グラフの目盛りの計算
 │   ├── cx.ts                      #   CSSのクラス名の合成
-│   └── format-metrics.ts          #   指標の表示用の文字
+│   ├── format-metrics.ts          #   指標の表示用の文字
 └── components/                    # アトミックデザイン。フォルダは「番号-名前」
     ├── 1-Atoms/      01-Button  02-StatusBadge  03-Panel
     ├── 2-Molecules/  01-ChartFrame  02-LineChart  03-BarChart  04-ParameterField  05-RadarIndicator
+    │                 06-ScatterChart  07-Histogram
     ├── 3-Organisms/  01-ScenarioPanel  02-ArchitectureViewer  03-ExperimentForm  04-RecordHistory
-    │                 05-ExistingRecordNotice  06-RunStatus  07-CompareChart
+    │                 05-ExistingRecordNotice  06-RunStatus  07-CompareChart  08-ScatterPanel
+    │                 09-ErrorDistributionPanel  10-DataSummary
     ├── 4-Templates/  01-AppHeader
-    └── 5-Pages/      01-Dashboard   # 画面全体(1枚)。useDashboard.ts / useExperiments.ts が状態を持つ
+    └── 5-Pages/      01-Dashboard   # 画面全体(1枚)。useDashboard.ts / useExperiments.ts / useVisuals.ts が状態を持つ
 ```
 `@/` は `src/`、`@shared/` は `../3-Shared/` を指します。
 
 ## グラフ
 ライブラリは使わず、SVGで描きます。`ChartFrame` が、題・凡例・ホバーの吹き出し・「データがありません」の表示をまとめ、
-`LineChart` / `BarChart` が、その中身を描きます。色は `theme/tokens.css` の `--chart-*` だけを使います。
+`LineChart` / `BarChart` / `ScatterChart` / `Histogram` が、その中身を描きます。色は `theme/tokens.css` の `--chart-*` だけを使います。
 
 ## APIの呼び出し
 APIのメソッドとパスは、`3-Shared/api-list.json` から**名前で引きます**(画面側に `/api/...` を書きません)。
