@@ -52,3 +52,44 @@ export interface ScenarioResult {
   history: { autoencoder_loss: number[] };
   metrics: Metrics;
 }
+
+// 評価計画(k交差検証など)
+export interface EvaluationPlan {
+  name: string;
+  description: string;
+  method: string;
+}
+
+// {モデル名: {パラメータ名: 値}}
+export type ParameterSet = Record<string, Record<string, string | number | null>>;
+
+export type MetricSummary = Record<string, { mean: number; std: number } | null>;
+
+export interface RecordSummary {
+  id: string;
+  created_at: string;
+  run_key: string;
+  scenario: string;
+  evaluation_plan: string;
+  summary: MetricSummary;
+  note: string;
+}
+
+export interface ExperimentRecord extends RecordSummary {
+  parameters: ParameterSet;
+  folds: { fold: number; metrics: Record<string, number | null> }[];
+  seconds: number;
+  git_commit: string | null;
+}
+
+export interface RunExperimentRequest {
+  scenario: string;
+  evaluation_plan: string;
+  parameters?: ParameterSet;
+  note?: string;
+  force?: boolean;
+}
+
+export type RunExperimentResponse =
+  | { status: "started" }
+  | { status: "exists"; record: RecordSummary };

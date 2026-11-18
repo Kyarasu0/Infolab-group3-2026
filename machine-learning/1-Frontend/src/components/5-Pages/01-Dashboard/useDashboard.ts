@@ -69,6 +69,8 @@ export function useDashboard() {
   return {
     mode, scenarios, job, selectedName, result, architecture, errorMessage,
     isBusy: job.state === "running",
+    setErrorMessage,
+    refreshJob: async () => setJob(await fetchCurrentJob()),
     select: setSelectedName,
     switchMode: (nextMode: Mode) => run(async () => setMode((await changeMode(nextMode)).mode)),
     train: (name: string) => startJob(() => startTraining(name)),
