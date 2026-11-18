@@ -5,11 +5,11 @@
 // (フロントには /api/... を直接書かない)
 // ==========================================
 
-import apiList from "../../../3-Shared/api-list.json";
+import apiList from "@shared/api-list.json";
 import type {
-  Architecture, EvaluationPlan, ExperimentRecord, JobStatus, Mode, ParameterSet,
-  RecordSummary, RunExperimentRequest, RunExperimentResponse, ScenarioResult, ScenarioSummary,
-} from "./api-types";
+  Architecture, DataSummary, ErrorDistribution, EvaluationPlan, ExperimentRecord, JobStatus, Mode, ParameterDescriptions, ParameterSet,
+  RecordSummary, RunExperimentRequest, RunExperimentResponse, ScatterData, ScenarioResult, ScenarioSummary,
+} from "@/functions/api-types";
 
 // APIの名前から、一覧の項目(メソッドとパス)を探す(なければ例外)
 function findApi(apiName: string) {
@@ -54,9 +54,14 @@ export const fetchParameters = (name: string) => callApi<ParameterSet>("get_scen
 export const startTraining = (scenario: string) => callApi("post_train", {}, { scenario });
 export const startComparison = () => callApi("post_compare");
 export const fetchCurrentJob = () => callApi<JobStatus>("get_current_job");
+export const fetchParameterDescriptions = () => callApi<ParameterDescriptions>("get_parameter_descriptions");
 export const fetchEvaluationPlans = () => callApi<EvaluationPlan[]>("get_evaluation_plans");
 export const runExperiment = (request: RunExperimentRequest) =>
   callApi<RunExperimentResponse>("post_experiment_run", {}, request);
 export const fetchRecords = () => callApi<RecordSummary[]>("get_experiment_records");
 export const fetchRecord = (recordId: string) =>
   callApi<ExperimentRecord>("get_experiment_record", { record_id: recordId });
+export const fetchScatter = (name: string) => callApi<ScatterData>("get_scenario_scatter", { name });
+export const fetchErrorDistribution = (name: string) =>
+  callApi<ErrorDistribution>("get_scenario_error_distribution", { name });
+export const fetchDataSummary = () => callApi<DataSummary>("get_data_summary");

@@ -1,0 +1,37 @@
+/* 画面の並べ方の共通のクラス */
+
+.stack {
+    /* 要素配置設定 */
+    display: flex;
+    flex-direction: column;
+
+    /* 余白設定 */
+    gap: var(--space-4);
+}
+
+.grid2 {
+    /* 要素配置設定 */
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(28rem, 1fr));
+
+    /* 余白設定 */
+    gap: var(--space-4);
+}
+
+.row {
+    /* 要素配置設定 */
+    display: flex;
+    flex-wrap: wrap;
+
+    /* 配置基準設定 */
+    align-items: center;
+
+    /* 余白設定 */
+    gap: var(--space-3);
+}
+
+.muted {
+    /* 文字設定 */
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+}

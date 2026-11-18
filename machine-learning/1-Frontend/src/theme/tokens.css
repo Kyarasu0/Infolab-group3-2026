@@ -1,0 +1,88 @@
+/*
+デザイントークン (theme/tokens.css):
+見た目の値(色・間隔・角丸・影・文字・動き)は、すべてここで決める。
+部品の module.css は、ここの変数だけを使い、色や大きさを直接書かない。
+見た目は、濃い青緑の背景・シアンの文字・角ばった枠・Makinas フォント
+(KyarasuDailyTracker と、その元の Idisclosure#3 の配色)。
+
+構成
+1. 色: 背景 / ガラス / 境界 / 文字 / アクセント / 状態 / チャート
+2. 間隔・角丸・影
+3. 文字・動き
+*/
+
+:root {
+  color-scheme: dark;
+
+  /* ===== 1. 色: 背景 ===== */
+  --color-bg: #001314;
+  --color-bg-elevated: #002729;
+
+  /* ===== 色: ガラス(半透明の面)と境界 ===== */
+  --color-surface: #3DE2F526;
+  --color-surface-hover: #3DE2F540;
+  --color-glass: #002729CC;
+  --color-border: #3DE2F540;
+  --color-border-strong: #3DE2F5;
+
+  /* ===== 色: 文字 ===== */
+  --color-text: #3DE2F5;
+  --color-text-muted: #6fa3a3;
+  --color-text-faint: #4f8a8a;
+
+  /* ===== 色: アクセント(選択・主ボタン・リンク) ===== */
+  --color-accent: #3DE2F5;
+  --color-accent-hover: #7FEFFA;
+  --color-accent-soft: #3DE2F526;
+  --color-accent-border: #3DE2F580;
+  --color-on-accent: #001314;
+
+  /* ===== 色: 状態(成功・注意・危険) ===== */
+  --color-success: #6DFF2E;
+  --color-success-soft: #6DFF2E19;
+  --color-warning: #FFD166;
+  --color-warning-soft: #FFD16619;
+  --color-warning-border: #FFD16666;
+  --color-danger: #FF3D3D;
+  --color-danger-soft: #FF3D3D19;
+  --color-danger-border: #FF3D3D66;
+
+  /* ===== 色: チャート(暗い面で、区別できる並び) ===== */
+  --chart-1: #4ad295;
+  --chart-2: #55c1ff;
+  --chart-3: #a58bff;
+  --chart-4: #ff6b6e;
+  --chart-5: #f5b94a;
+  --chart-6: #f58ad8;
+  --chart-grid: #ffffff12;
+  --chart-axis: #ffffff2e;
+
+  /* ===== 2. 間隔 ===== */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+
+  /* ===== 角丸・影 ===== */
+  --radius-sm: 0;
+  --radius-lg: 0;
+  --shadow-focus: 0 0 6px #3DE2F580;
+
+  /* ===== 3. 文字 ===== */
+  --font-sans: "makinas4", system-ui, "Noto Sans JP", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.85rem;
+  --font-size-md: 0.95rem;
+  --font-size-lg: 1.15rem;
+  --font-size-xl: 1.4rem;
+  --line-height: 1.6;
+
+  /* ===== 動き・重なり順 ===== */
+  --duration-fast: 120ms;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --z-header: 10;
+  --z-tip: 20;
+}

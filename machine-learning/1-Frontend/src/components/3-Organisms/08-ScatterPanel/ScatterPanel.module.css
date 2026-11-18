@@ -1,0 +1,5 @@
+.muted {
+    /* 文字設定 */
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+}

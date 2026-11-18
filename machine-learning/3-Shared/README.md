@@ -7,6 +7,7 @@
 |---|---|---|
 | `api-list.json` | API一覧(name・method・path・handler_file・mode・description) | バックエンドは、これを読んでルートを登録し、`name` の関数を実行する。フロントは、`name` でAPIを選んで呼ぶ |
 | `concept/modes.json` | モード(`train` / `predict`)と表示名 | 両側で、同じ名前を使う |
+| `concept/states.json` | 状態(`normal` / `stress` / `fatigue`)と表示名 | フロントのグラフの凡例・吹き出しに使う |
 | `concept/metrics.json` | 評価指標の名前と表示名 | フロントの表の見出しに使う |
 
 API一覧を共有する方式は、KyamomeChick(`4-web-ui/3-Shared/api-list.json`)にならった。

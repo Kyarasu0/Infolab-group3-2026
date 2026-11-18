@@ -93,3 +93,34 @@ export interface RunExperimentRequest {
 export type RunExperimentResponse =
   | { status: "started" }
   | { status: "exists"; record: RecordSummary };
+
+// パラメータの日本語名と説明(モデルごと)
+export interface ParameterDescriptions {
+  [model: string]: {
+    model: { label: string; description: string };
+    parameters: Record<string, { label: string; description: string }>;
+  };
+}
+
+// グラフ用のデータ
+export interface ScatterPoint { x: number; y: number; group: string; subtype: number | null }
+export interface ScatterData {
+  input: string;
+  total_points: number;
+  shown_points: number;
+  points: ScatterPoint[];
+  explained_variance_ratio: number[];
+}
+export interface ErrorDistribution {
+  threshold: number;
+  bin_edges: number[];
+  ratios: Record<string, number[]>;
+  counts: Record<string, number>;
+}
+export interface DataSummary {
+  normal_count: number;
+  labeled_count: number;
+  feature_count: number;
+  counts: Record<string, number>;
+  features: Record<string, { mean: number[]; std: number[] }>;
+}

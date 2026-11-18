@@ -1,0 +1,28 @@
+{
+  "model": {
+    "label": "SVM",
+    "description": "「乖離あり」と判定されたデータが、ストレスか疲労かを分類するモデル"
+  },
+  "parameters": {
+    "kernel": {
+      "label": "カーネル",
+      "description": "境界線の形。linear は直線、rbf は曲線(多くの場合の標準)、poly は多項式、sigmoid はS字型"
+    },
+    "C": {
+      "label": "誤分類へのペナルティ(C)",
+      "description": "大きいと誤分類を許さず、学習データに強く合わせる(過学習しやすい)。小さいと境界がなめらかになる"
+    },
+    "gamma": {
+      "label": "ガンマ",
+      "description": "rbf などで、1点の影響が及ぶ範囲。大きいと影響が狭く、複雑な境界になる。小さいと広く、単純な境界になる。scale / auto は自動で決め、数値も指定できる"
+    },
+    "class_weight": {
+      "label": "クラスの重み",
+      "description": "balanced なら、ラベルの件数の偏りを補正する(件数の少ないラベルを重視する)。補正しないときは null と入力する"
+    },
+    "seed": {
+      "label": "乱数の種",
+      "description": "同じ値なら同じ結果になる(再現用)"
+    }
+  }
+}

@@ -1,0 +1,5 @@
+[
+  { "name": "normal", "label": "通常" },
+  { "name": "stress", "label": "ストレス" },
+  { "name": "fatigue", "label": "疲労" }
+]

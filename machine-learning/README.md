@@ -49,6 +49,13 @@ machine-learning/
 - `anomaly_gate`: AEの乖離が閾値未満なら normal とし、SVMに渡さない(既定 true)
 - `parameters` に書かない値は、`models/*/*.json` の既定値を使う
 
+## グラフ(画面)
+データ(`data/training_data.npz`)と学習済みモデルがあるときだけ、画面に次のグラフが出ます(無いときは「データがありません」などの理由を表示)。
+- **散布図**: 分類器に入る特徴量を、主成分分析で2次元にした図(色 = 状態、形 = サブタイプ)。学習に使わなかった評価用データ(7:3の3割)を使う
+- **再構成誤差の分布**: 状態ごとの誤差の割合と、乖離の閾値。オートエンコーダーを使うシナリオのみ
+- **データの概要**: 件数と、特徴量ごとの平均(状態別)。特徴量の数は問わない
+- そのほか: シナリオ比較(棒)・学習曲線(折れ線)・モデルの構成
+
 ## 学習済みモデルの構成JSON
 学習すると `artifacts/<シナリオ名>/architecture.json` ができ、各層の入出力数・パラメータ数・重みの統計、
 SVMのサポートベクター数、クラスタ数が見られます(API: `GET /scenarios/{name}/architecture`)。
@@ -78,7 +85,7 @@ machine-learning/start.sh predict      # 予測モードで起動
 - **パラメータ**: モデルの既定JSON → シナリオの `parameters` → 実行時の上書き、の順に重ねる。記録には、実際に使った全パラメータが残る
 - **実行キー**: 合成後パラメータ・pipeline・評価計画・データのハッシュから作る。同じなら「実行済み」とみなす
 - **記録の中身**: 日時・シナリオ・全パラメータ・評価計画・データ情報(件数・ハッシュ)・gitのcommit・foldごとの指標と平均±標準偏差・学習時間・メモ
-- 交差検証は「設定の良し悪し」を測るもので、予測用モデルは作らない。決まった設定で全データから学習するのは `POST /api/train`
+- 交差検証は「設定の良し悪し」を測るもので、予測用モデルは作らない。予測用のモデルを作る(データの7割で学習し、残り3割で評価して、保存する)のは `POST /api/train`
 
 ## API(3-Shared/api-list.json)
 API一覧は `3-Shared/api-list.json` に1か所だけ書き、フロントとバックの両方が読みます(KyamomeChickの `3-Shared/api-list.json` と同じ方式)。
@@ -94,6 +101,8 @@ API一覧は `3-Shared/api-list.json` に1か所だけ書き、フロントと�
 | `get_current_job` | 両方 | 進捗(エポックごとの損失) |
 | `get_scenarios` `get_scenario_result` `get_scenario_architecture` `get_scenario_parameters` | 両方 | 一覧・指標と学習曲線・層ごとの構成・パラメータ |
 | `get_evaluation_plans` `get_experiment_records` `get_experiment_record` | 両方 | 評価計画・実験の記録の一覧と詳細 |
+| `get_parameter_descriptions` | 両方 | パラメータの日本語名と説明(画面の入力欄に表示) |
+| `get_scenario_scatter` `get_scenario_error_distribution` `get_data_summary` | 両方 | グラフ用の値(散布図・再構成誤差の分布・データの概要)。データと学習済みモデルがあるときだけ返る |
 | `post_predict` | 予測のみ | 予測。**通知用バックエンドから呼ばれる想定** |
 
 モードに合わないAPIは `409` を返します。

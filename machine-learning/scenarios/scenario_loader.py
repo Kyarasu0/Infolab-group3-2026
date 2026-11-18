@@ -35,6 +35,15 @@ def merge_parameters(scenario: dict) -> dict:
     }
 
 
+def load_parameter_descriptions() -> dict:
+    """モデルごとの、パラメータの日本語名と説明を返す(models/*/*.descriptions.json)"""
+    # 1. 既定のパラメータJSONと同じ場所の、<名前>.descriptions.json を読む
+    return {
+        model: load_json(path.with_name(f"{path.stem}.descriptions.json"))
+        for model, path in DEFAULT_PARAMS_PATHS.items()
+    }
+
+
 def validate_scenario(scenario: dict) -> None:
     seen_models = []
     for stage in scenario["pipeline"]:

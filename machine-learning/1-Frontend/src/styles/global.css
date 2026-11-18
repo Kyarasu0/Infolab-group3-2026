@@ -1,0 +1,134 @@
+/*
+全体の土台 (styles/global.css):
+リセットと、タグそのもの(body・見出し・入力欄・ボタン・表)の見た目。クラス名は使わない。
+色や大きさは theme/tokens.css の変数だけを使う。
+*/
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+@font-face {
+    font-family: "makinas4";
+    src: url("/fonts/Makinas-4-Flat.otf") format("opentype");
+    font-display: swap;
+}
+
+html,
+body,
+#root {
+    min-height: 100%;
+}
+
+body {
+    /* バックグラウンド設定 */
+    background-color: var(--color-bg);
+
+    /* 文字設定 */
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-size: var(--font-size-md);
+    line-height: var(--line-height);
+}
+
+h1,
+h2,
+h3 {
+    /* 文字設定 */
+    font-weight: normal;
+}
+
+input,
+select {
+    /* 大きさ設定 */
+    min-width: 0;
+
+    /* バックグラウンド設定 */
+    background-color: var(--color-bg);
+
+    /* 余白設定 */
+    padding: var(--space-2) var(--space-3);
+
+    /* 文字設定 */
+    color: var(--color-text);
+    font: inherit;
+
+    /* 装飾設定 */
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+}
+
+input:focus,
+select:focus {
+    /* 装飾設定 */
+    border-color: var(--color-accent);
+    box-shadow: var(--shadow-focus);
+    outline: none;
+}
+
+button {
+    /* バックグラウンド設定 */
+    background-color: var(--color-surface);
+
+    /* 余白設定 */
+    padding: var(--space-2) var(--space-4);
+
+    /* 文字設定 */
+    color: var(--color-text);
+    font: inherit;
+
+    /* 装飾設定 */
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+    /* 装飾設定 */
+    border-color: var(--color-accent);
+}
+
+button:disabled {
+    /* 文字設定 */
+    color: var(--color-text-faint);
+
+    /* 装飾設定 */
+    cursor: not-allowed;
+}
+
+table {
+    /* 大きさ設定 */
+    width: 100%;
+
+    /* 文字設定 */
+    font-size: var(--font-size-sm);
+    text-align: left;
+
+    /* 装飾設定 */
+    border-collapse: collapse;
+}
+
+th {
+    /* 文字設定 */
+    color: var(--color-text-muted);
+    font-weight: normal;
+}
+
+th,
+td {
+    /* 余白設定 */
+    padding: var(--space-1) var(--space-2);
+
+    /* 装飾設定 */
+    border-bottom: 1px solid var(--color-border);
+}
+
+pre {
+    /* 文字設定 */
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+}

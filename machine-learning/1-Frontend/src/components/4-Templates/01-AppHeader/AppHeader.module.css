@@ -1,0 +1,38 @@
+.header {
+    /* バックグラウンド設定 */
+    background-color: var(--color-glass);
+
+    /* 要素配置設定 */
+    position: sticky;
+    top: 0;
+    z-index: var(--z-header);
+    display: flex;
+    flex-wrap: wrap;
+
+    /* 配置基準設定 */
+    align-items: center;
+    justify-content: space-between;
+
+    /* 余白設定 */
+    padding: var(--space-3) var(--space-5);
+    gap: var(--space-3);
+
+    /* 装飾設定 */
+    border-bottom: 1px solid var(--color-border);
+}
+
+.title {
+    /* 文字設定 */
+    font-size: var(--font-size-xl);
+}
+
+.right {
+    /* 要素配置設定 */
+    display: flex;
+
+    /* 配置基準設定 */
+    align-items: center;
+
+    /* 余白設定 */
+    gap: var(--space-3);
+}

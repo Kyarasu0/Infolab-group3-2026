@@ -1,6 +1,7 @@
-import metrics from "../../../../../3-Shared/concept/metrics.json";
-import type { ExperimentRecord, RecordSummary } from "../../../functions/api-types";
-import { formatMeanStd, formatValue } from "../../../functions/format-metrics";
+import metrics from "@shared/concept/metrics.json";
+import type { ExperimentRecord, RecordSummary } from "@/functions/api-types";
+import { formatMeanStd, formatValue } from "@/functions/format-metrics";
+import { Panel } from "../../1-Atoms/03-Panel/Panel";
 import styles from "./RecordHistory.module.css";
 
 interface RecordHistoryProps {
@@ -12,10 +13,10 @@ interface RecordHistoryProps {
 
 export function RecordHistory({ records, selectedId, onSelect, detail }: RecordHistoryProps) {
   return (
-    <section className={styles.history}>
-      <h2 className={styles.title}>実験の記録(平均 ± 標準偏差)</h2>
-      {records.length === 0 ? <p className={styles.empty}>まだ記録がありません</p> : (
-        <table className={styles.table}>
+    <Panel>
+      <h2>実験の記録(平均 ± 標準偏差)</h2>
+      {records.length === 0 ? <p className={styles.muted}>まだ記録がありません</p> : (
+        <table>
           <thead>
             <tr>
               <th>日時</th><th>シナリオ</th><th>評価計画</th>
@@ -27,9 +28,7 @@ export function RecordHistory({ records, selectedId, onSelect, detail }: RecordH
             {records.map((record) => (
               <tr key={record.id} className={record.id === selectedId ? styles.selectedRow : styles.row}
                 onClick={() => onSelect(record.id)}>
-                <td>{record.created_at.replace("T", " ")}</td>
-                <td>{record.scenario}</td>
-                <td>{record.evaluation_plan}</td>
+                <td>{record.created_at.replace("T", " ")}</td><td>{record.scenario}</td><td>{record.evaluation_plan}</td>
                 {metrics.map((metric) => <td key={metric.name}>{formatMeanStd(record.summary, metric.name)}</td>)}
                 <td>{record.note}</td>
               </tr>
@@ -39,12 +38,10 @@ export function RecordHistory({ records, selectedId, onSelect, detail }: RecordH
       )}
 
       {detail && (
-        <div className={styles.detail}>
-          <h3 className={styles.subtitle}>選んだ記録の詳細(学習 {detail.seconds}秒 / commit {detail.git_commit ?? "-"})</h3>
-          <table className={styles.table}>
-            <thead>
-              <tr><th>fold</th>{metrics.map((metric) => <th key={metric.name}>{metric.label}</th>)}</tr>
-            </thead>
+        <div>
+          <h3>選んだ記録の詳細(学習 {detail.seconds}秒 / commit {detail.git_commit ?? "-"})</h3>
+          <table>
+            <thead><tr><th>fold</th>{metrics.map((metric) => <th key={metric.name}>{metric.label}</th>)}</tr></thead>
             <tbody>
               {detail.folds.map((fold) => (
                 <tr key={fold.fold}>
@@ -57,6 +54,6 @@ export function RecordHistory({ records, selectedId, onSelect, detail }: RecordH
           <pre className={styles.parameters}>{JSON.stringify(detail.parameters, null, 2)}</pre>
         </div>
       )}
-    </section>
+    </Panel>
   );
 }

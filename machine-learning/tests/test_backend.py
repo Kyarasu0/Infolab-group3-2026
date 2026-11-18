@@ -108,3 +108,20 @@ def test_実験APIの入力エラーと評価計画_パラメータ一覧(client
     assert client.get("/api/scenarios/01-latent-to-svm/parameters").json()["autoencoder"]["latent_dim"] == 4
     client.put("/api/mode", json={"mode": "predict"})
     assert client.post("/api/experiments/run", json={"scenario": "04-raw-svm-baseline", "evaluation_plan": "kfold-5"}).status_code == 409
+
+
+def test_グラフ用APIは_学習済みのシナリオで値を返し_未学習や対象外は理由つきで断る(client):
+    # 1. 未学習は409、データの概要はデータがあれば返る
+    assert client.get("/api/scenarios/01-latent-to-svm/scatter").status_code == 409
+    assert client.get("/api/scenarios/nope/scatter").status_code == 404
+    assert client.get("/api/data/summary").json()["feature_count"] == 6
+
+    # 2. 学習後は、散布図と誤差の分布が返る(AEを使わないシナリオの誤差の分布は400)
+    for scenario in ("01-latent-to-svm", "04-raw-svm-baseline"):
+        params = {"autoencoder": {"epochs": 3}}
+        client.post("/api/train", json={"scenario": scenario})
+        _wait_for_job(client)
+    scatter = client.get("/api/scenarios/01-latent-to-svm/scatter").json()
+    assert scatter["shown_points"] > 0 and {"x", "y", "group", "subtype"} <= set(scatter["points"][0])
+    assert client.get("/api/scenarios/01-latent-to-svm/error-distribution").json()["threshold"] > 0
+    assert client.get("/api/scenarios/04-raw-svm-baseline/error-distribution").status_code == 400

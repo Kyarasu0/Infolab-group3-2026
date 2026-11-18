@@ -53,6 +53,11 @@ models/
 - 入力は標準化してから学習する
 - stress・fatigue など、状態ごとに別々のクラスタリングを学習する(`scenarios/scenario_runner.py`)
 
+### パラメータの日本語の説明(`*.descriptions.json`)
+各モデルのフォルダにある `<名前>.descriptions.json` に、パラメータの日本語名と説明(何のパラメータか・大きくすると/小さくするとどうなるか)を書いてあります。
+画面の「実験」の入力欄に、そのまま表示されます(`GET /api/parameter-descriptions`)。
+**パラメータを足したら、説明も足してください**(`tests/test_scenarios.py` が、JSONのキーと説明のキーの一致を確かめます)。
+
 ## 共通のメソッド
 | メソッド | 内容 |
 |---|---|
@@ -62,7 +67,7 @@ models/
 | `describe()` | 層ごとの構成・パラメータ量などを返す(`artifacts/<シナリオ>/architecture.json` の元) |
 
 ## モデルを追加するとき
-1. `models/<名前>/` に、`<名前>.py` と `<名前>.json` を作る(上の共通のメソッドをそろえる)
+1. `models/<名前>/` に、`<名前>.py` と `<名前>.json` と `<名前>.descriptions.json` を作る(上の共通のメソッドをそろえる)
 2. `scenarios/scenario_loader.py` の `DEFAULT_PARAMS_PATHS` と、`scenarios/scenario_runner.py` の `fit` / `predict` に、段として組み込む
 3. シナリオJSONの `pipeline` に、`{"model": "<名前>"}` を書く
 4. `tests/test_models.py` に、任意の次元で動くテストを足す

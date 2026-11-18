@@ -1,0 +1,118 @@
+/* チャートの共通のクラス(外枠・凡例・吹き出し・軸と線)。色は theme/tokens.css の変数だけを使う */
+
+.chart {
+    /* 大きさ設定 */
+    width: 100%;
+
+    /* 要素配置設定 */
+    position: relative;
+
+    /* 余白設定 */
+    margin: 0;
+}
+
+.caption {
+    /* 要素配置設定 */
+    display: flex;
+    flex-wrap: wrap;
+
+    /* 配置基準設定 */
+    align-items: baseline;
+
+    /* 余白設定 */
+    gap: var(--space-3);
+    margin-bottom: var(--space-2);
+}
+
+.subtitle {
+    /* 文字設定 */
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+}
+
+.legend {
+    /* 要素配置設定 */
+    display: flex;
+    flex-wrap: wrap;
+
+    /* 余白設定 */
+    gap: var(--space-4);
+    margin-bottom: var(--space-2);
+
+    /* 文字設定 */
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+}
+
+.swatch {
+    /* 大きさ設定 */
+    width: 0.7rem;
+    height: 0.7rem;
+
+    /* 要素配置設定 */
+    display: inline-block;
+
+    /* 余白設定 */
+    margin-right: var(--space-1);
+}
+
+.svg {
+    /* 大きさ設定 */
+    width: 100%;
+    height: auto;
+
+    /* 要素配置設定 */
+    display: block;
+}
+
+.grid {
+    /* 装飾設定 */
+    stroke: var(--chart-grid);
+}
+
+.axis {
+    /* 装飾設定 */
+    stroke: var(--chart-axis);
+}
+
+.tickText {
+    /* バックグラウンド設定 */
+    fill: var(--color-text-muted);
+
+    /* 文字設定 */
+    font-size: 11px;
+}
+
+.empty {
+    /* 余白設定 */
+    padding: var(--space-5) 0;
+
+    /* 文字設定 */
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+}
+
+.tip {
+    /* 要素配置設定 */
+    position: absolute;
+    z-index: var(--z-tip);
+
+    /* バックグラウンド設定 */
+    background-color: var(--color-bg-elevated);
+
+    /* 余白設定 */
+    padding: var(--space-2) var(--space-3);
+
+    /* 文字設定 */
+    font-size: var(--font-size-sm);
+    white-space: nowrap;
+
+    /* 装飾設定 */
+    border: 1px solid var(--color-border-strong);
+    pointer-events: none;
+}
+
+.tipTitle {
+    /* 文字設定 */
+    color: var(--color-text-muted);
+}
