@@ -15,18 +15,18 @@
 ```text
 machine-learning/
 ├── data/                 # 取得データ(空)。形式は data/README.md
-├── models/               # 1フォルダ1モデル。パラメータはJSONに切り出し
+├── models/               # 1フォルダ1モデル。パラメータはJSONに切り出し(各パラメータの意味は models/README.md)
 │   ├── autoencoder/      #   autoencoder.py / autoencoder.json
 │   ├── svm/              #   svm_classifier.py / svm.json
 │   └── clustering/       #   clustering_model.py / clustering.json
 ├── scenarios/            # モデルの順番とパラメータを決めるシナリオ(JSON)と、実行・比較のコード
-├── experiments/          # 記録者: 評価して、結果を記録する
+├── experiments/          # 記録者: 評価して、結果を記録する(詳細は experiments/README.md)
 │   ├── evaluation_plans/ #   評価計画(k交差検証・holdoutなど。kの値はここのJSON)
 │   ├── records/          #   実験の記録(1実行1JSON。git管理外)
 │   └── recorder/         #   分割・交差検証・記録のプログラム
 ├── 3-Shared/             # フロントとバックの両方が読むもの(api-list.json など)
 ├── 2-Backend/            # FastAPI。server.py / api/(1 API = 1ファイル = 1関数) / functions/
-├── 1-Frontend/           # React。学習状況・シナリオ比較・実験の実行と記録の表示
+├── 1-Frontend/           # React。学習状況・シナリオ比較・実験の実行と記録の表示(1-Frontend/README.md)
 ├── tests/                # pytest(合成データを使用)
 └── artifacts/            # 学習済みモデルと結果(自動生成・git管理外)
 ```
