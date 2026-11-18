@@ -1,0 +1,7 @@
+{
+  "description": "AEを使わず、元の値をそのままSVMに入れる(比較の基準)",
+  "pipeline": [
+    { "model": "svm", "input": "raw" },
+    { "model": "clustering", "input": "raw" }
+  ]
+}

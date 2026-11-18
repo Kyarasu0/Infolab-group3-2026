@@ -1,0 +1,12 @@
+{
+  "description": "元の値と復号後の差(どの特徴がズレたか)をSVMに入れる",
+  "anomaly_gate": true,
+  "parameters": {
+    "autoencoder": { "latent_dim": 4, "hidden_layers": 2 }
+  },
+  "pipeline": [
+    { "model": "autoencoder" },
+    { "model": "svm", "input": "residual" },
+    { "model": "clustering", "input": "residual" }
+  ]
+}

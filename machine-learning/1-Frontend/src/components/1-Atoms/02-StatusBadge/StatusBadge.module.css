@@ -1,0 +1,37 @@
+.badge {
+    /* バックグラウンド設定 */
+    background-color: var(--color-text-muted);
+
+    /* 要素配置設定 */
+    display: inline-block;
+
+    /* 余白設定 */
+    padding: 0 var(--space-small);
+
+    /* 文字設定 */
+    color: var(--color-accent-text);
+    font-size: var(--font-size-small);
+
+    /* 装飾設定 */
+    border-radius: var(--radius-medium);
+}
+
+.neutral {
+    /* バックグラウンド設定 */
+    background-color: var(--color-text-muted);
+}
+
+.success {
+    /* バックグラウンド設定 */
+    background-color: var(--color-success);
+}
+
+.warning {
+    /* バックグラウンド設定 */
+    background-color: var(--color-warning);
+}
+
+.danger {
+    /* バックグラウンド設定 */
+    background-color: var(--color-danger);
+}

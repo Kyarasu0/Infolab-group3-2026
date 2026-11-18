@@ -1,0 +1,12 @@
+{
+  "description": "AEで復号した値(通常パターンに寄せた値)をSVMに入れる",
+  "anomaly_gate": true,
+  "parameters": {
+    "autoencoder": { "latent_dim": 4, "hidden_layers": 2 }
+  },
+  "pipeline": [
+    { "model": "autoencoder" },
+    { "model": "svm", "input": "decoded" },
+    { "model": "clustering", "input": "decoded" }
+  ]
+}

@@ -1,0 +1,4 @@
+[
+  { "name": "train", "label": "学習モード" },
+  { "name": "predict", "label": "予測モード" }
+]
