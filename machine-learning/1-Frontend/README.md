@@ -32,6 +32,7 @@ src/
 │   ├── chart-scale.ts             #   グラフの目盛りの計算
 │   ├── cx.ts                      #   CSSのクラス名の合成
 │   ├── format-metrics.ts          #   指標の表示用の文字
+│   └── group-style.ts             #   状態(通常・ストレス・疲労)の表示名と色
 └── components/                    # アトミックデザイン。フォルダは「番号-名前」
     ├── 1-Atoms/      01-Button  02-StatusBadge  03-Panel
     ├── 2-Molecules/  01-ChartFrame  02-LineChart  03-BarChart  04-ParameterField  05-RadarIndicator
