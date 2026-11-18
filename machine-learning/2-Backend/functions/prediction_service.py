@@ -4,7 +4,7 @@ import threading
 from scenarios.scenario_loader import list_scenario_names
 from scenarios.scenario_runner import ScenarioRunner
 
-from backend_settings import ARTIFACTS_DIR, DEFAULT_SCENARIO
+from functions.backend_settings import ARTIFACTS_DIR, DEFAULT_SCENARIO
 
 _runners = {}
 _lock = threading.Lock()

@@ -5,7 +5,7 @@ from scenarios.scenario_loader import list_scenario_names, load_scenario
 from scenarios.scenario_runner import ScenarioRunner
 from scenarios.training_data import TrainingData
 
-from backend_settings import ARTIFACTS_DIR, TRAINING_DATA_PATH
+from functions.backend_settings import ARTIFACTS_DIR, TRAINING_DATA_PATH
 
 TEST_RATIO = 0.3
 SPLIT_SEED = 0

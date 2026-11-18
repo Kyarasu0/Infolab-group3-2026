@@ -1,0 +1,7 @@
+[
+  { "name": "accuracy", "label": "正解率" },
+  { "name": "macro_f1", "label": "F1" },
+  { "name": "anomaly_detection_rate", "label": "乖離検出率" },
+  { "name": "normal_false_alarm_rate", "label": "通常の誤検出率" },
+  { "name": "cluster_silhouette", "label": "サブタイプ分離" }
+]

@@ -2,7 +2,7 @@
 import os
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 # 学習済みモデルと結果の保存先
 ARTIFACTS_DIR = Path(os.environ.get("ML_ARTIFACTS_DIR", PROJECT_ROOT / "artifacts"))
