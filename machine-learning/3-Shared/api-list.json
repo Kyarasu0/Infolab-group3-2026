@@ -10,6 +10,10 @@
     {"name": "get_scenario_architecture", "method": "GET", "path": "/api/scenarios/{name}/architecture", "handler_file": "get-scenario-architecture.py", "mode": "any", "description": "学習済みシナリオの、層ごとの構成とパラメータ量を返す"},
     {"name": "get_scenario_parameters", "method": "GET", "path": "/api/scenarios/{name}/parameters", "handler_file": "get-scenario-parameters.py", "mode": "any", "description": "シナリオで使われる全パラメータ(既定値+シナリオの上書き)を返す"},
 
+    {"name": "get_scenario_scatter", "method": "GET", "path": "/api/scenarios/{name}/scatter", "handler_file": "get-scenario-scatter.py", "mode": "any", "description": "学習済みシナリオの、評価用データの散布図(2次元に落とした点)を返す"},
+    {"name": "get_scenario_error_distribution", "method": "GET", "path": "/api/scenarios/{name}/error-distribution", "handler_file": "get-scenario-error-distribution.py", "mode": "any", "description": "学習済みシナリオの、再構成誤差の分布と乖離の閾値を返す(オートエンコーダーを使うシナリオのみ)"},
+    {"name": "get_data_summary", "method": "GET", "path": "/api/data/summary", "handler_file": "get-data-summary.py", "mode": "any", "description": "学習データの件数と、特徴量ごとの平均・標準偏差を返す"},
+
     {"name": "post_train", "method": "POST", "path": "/api/train", "handler_file": "post-train.py", "mode": "train", "status_code": 202, "description": "データの7割でシナリオを学習し(残り3割で評価)、予測用モデルを保存する(別スレッドで実行)"},
     {"name": "post_compare", "method": "POST", "path": "/api/compare", "handler_file": "post-compare.py", "mode": "train", "status_code": 202, "description": "全シナリオを同じデータで学習・評価して比べる(別スレッドで実行)"},
     {"name": "get_compare_result", "method": "GET", "path": "/api/compare/result", "handler_file": "get-compare-result.py", "mode": "any", "description": "直近のシナリオ比較の結果を返す"},

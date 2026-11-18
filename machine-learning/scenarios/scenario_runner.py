@@ -68,7 +68,7 @@ class ScenarioRunner:
         # 3. 乖離のあるサンプルだけ、SVMで状態を判定する
         states = [NORMAL_STATE] * row_count
         probabilities = [None] * row_count
-        svm_features = features[self._input_of("svm")]
+        svm_features = features[self.input_of("svm")]
         if active.any():
             active_features = svm_features[active]
             for row, state, probability in zip(
@@ -80,7 +80,7 @@ class ScenarioRunner:
                 probabilities[row] = probability
 
         # 4. 状態ごとのクラスタリングで、サブタイプを決める
-        subtypes = self._predict_subtypes(features[self._input_of("clustering")], states)
+        subtypes = self._predict_subtypes(features[self.input_of("clustering")], states)
 
         return [
             {
@@ -99,7 +99,7 @@ class ScenarioRunner:
 
         # 2. 状態ごとに、サブタイプの分かれ具合を測る材料を集める
         features = build_feature_sets(test_data.labeled_x, self.autoencoder)
-        cluster_features = features[self._input_of("clustering")]
+        cluster_features = features[self.input_of("clustering")]
         cluster_materials = {}
         for label, model in self.clusterings.items():
             rows = test_data.labels == label
@@ -152,7 +152,7 @@ class ScenarioRunner:
             runner.clusterings[path.stem] = ClusteringModel.load(path)
         return runner
 
-    def _input_of(self, model: str) -> str:
+    def input_of(self, model: str) -> str:
         for stage in self.scenario["pipeline"]:
             if stage["model"] == model:
                 return stage.get("input", "raw")

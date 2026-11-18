@@ -73,3 +73,37 @@ def test_全パラメータに日本語の説明がある():
         assert descriptions[model]["model"]["label"] and descriptions[model]["model"]["description"]
         for item in descriptions[model]["parameters"].values():
             assert item["label"].strip() and item["description"].strip()
+
+
+def test_グラフ用の値が作れる():
+    import numpy as np
+    from scenarios.visualization_data import data_summary, error_distribution, scatter_data
+
+    data = make_training_data(8)
+    train, test = data.split(0.3, 0)
+    runner = ScenarioRunner(_fast(load_scenario("01-latent-to-svm")))
+    runner.fit(train)
+
+    # 散布図: 全点に座標とグループがあり、stress/fatigue にはサブタイプがある
+    scatter = scatter_data(runner, test)
+    assert scatter["input"] == "latent" and len(scatter["explained_variance_ratio"]) == 2
+    assert {p["group"] for p in scatter["points"]} == {"normal", "stress", "fatigue"}
+    assert all(p["subtype"] is None for p in scatter["points"] if p["group"] == "normal")
+    assert all(p["subtype"] is not None for p in scatter["points"] if p["group"] != "normal")
+
+    # 誤差の分布: 各グループの割合の合計が1で、通常より異常の誤差が大きい側に寄る
+    distribution = error_distribution(runner, test)
+    assert all(abs(sum(r) - 1) < 1e-9 for r in distribution["ratios"].values())
+    assert np.argmax(distribution["ratios"]["stress"]) > np.argmax(distribution["ratios"]["normal"])
+
+    # AEを使わないシナリオには、誤差の分布が無い。散布図は raw 特徴量で作れる
+    baseline = ScenarioRunner(load_scenario("04-raw-svm-baseline"))
+    baseline.fit(train)
+    with pytest.raises(ValueError):
+        error_distribution(baseline, test)
+    assert scatter_data(baseline, test)["input"] == "raw"
+
+    # データの概要: 次元数どおりの平均・標準偏差が、グループごとに返る
+    summary = data_summary(data)
+    assert summary["feature_count"] == 8 and len(summary["features"]["normal"]["mean"]) == 8
+    assert summary["counts"]["stress"] == 80
