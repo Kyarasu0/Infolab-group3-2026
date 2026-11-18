@@ -1,0 +1,7 @@
+{
+  "description": "10分割の交差検証(ラベルで層化)",
+  "method": "kfold",
+  "k": 10,
+  "stratified": true,
+  "seed": 0
+}

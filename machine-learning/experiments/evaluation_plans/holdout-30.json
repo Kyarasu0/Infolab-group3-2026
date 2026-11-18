@@ -1,0 +1,6 @@
+{
+  "description": "学習7割・評価3割に1回だけ分ける",
+  "method": "holdout",
+  "test_ratio": 0.3,
+  "seed": 0
+}
