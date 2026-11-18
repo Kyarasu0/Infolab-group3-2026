@@ -22,6 +22,6 @@ export default defineConfig({
     // 3-Shared/(API一覧など)は、フロントの外にあるので、読めるようにする
     fs: { allow: [FRONTEND_DIR, SHARED_DIR] },
     // バックエンド(FastAPI)へ中継して、CORSを意識しなくてよくする(パスは /api/... のまま)
-    proxy: { "/api": "http://localhost:8000" },
+    proxy: { "/api": `http://localhost:${process.env.ML_BACKEND_PORT ?? 8000}` },
   },
 });

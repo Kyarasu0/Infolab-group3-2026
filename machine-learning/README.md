@@ -55,13 +55,19 @@ SVMのサポートベクター数、クラスタ数が見られます(API: `GET 
 
 ## 起動
 ```bash
-cd machine-learning
-python3 -m venv .venv && .venv/bin/pip install --extra-index-url https://download.pytorch.org/whl/cpu -r requirements.txt
-PYTHONPATH=. .venv/bin/uvicorn server:app --app-dir 2-Backend --port 8000   # バックエンド
-cd 1-Frontend && npm install && npm run dev                                 # フロント(http://localhost:5173)
-PYTHONPATH=. .venv/bin/python -m pytest tests -q                            # テスト
+machine-learning/setup.sh              # 初回だけ: Python環境(.venv)とnpmの依存を用意する(何度実行してもよい)
+machine-learning/start.sh              # 2回目以降: バックエンドとフロントをまとめて起動(学習モード)
+machine-learning/start.sh predict      # 予測モードで起動
 ```
-環境変数: `ML_MODE`(起動時のモード。既定 train)、`ML_DEFAULT_SCENARIO`、`ML_TRAINING_DATA`、`ML_ARTIFACTS_DIR`、`ML_RECORDS_DIR`、`ML_ALLOWED_ORIGINS`
+- フロント: http://localhost:5173 / バックエンド: http://localhost:8000(`ML_BACKEND_PORT` で変えられる)。止めるときは Ctrl+C
+- 別々に起動するとき:
+  ```bash
+  cd machine-learning
+  PYTHONPATH=. .venv/bin/uvicorn server:app --app-dir 2-Backend --port 8000   # バックエンド
+  cd 1-Frontend && npm run dev                                                 # フロント
+  ```
+- テスト: `PYTHONPATH=. .venv/bin/python -m pytest tests -q`
+- 環境変数: `ML_MODE`(起動時のモード。既定 train)、`ML_BACKEND_PORT`、`ML_DEFAULT_SCENARIO`、`ML_TRAINING_DATA`、`ML_ARTIFACTS_DIR`、`ML_RECORDS_DIR`、`ML_ALLOWED_ORIGINS`
 
 ## 実験の記録(experiments/)
 シナリオ・評価計画・パラメータを選んで評価し、結果を `experiments/records/` に1実行1JSONで残します
