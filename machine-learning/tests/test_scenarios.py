@@ -62,3 +62,14 @@ def test_構成JSONに各層のパラメータ量が出る(tmp_path):
     assert architecture["svm"]["total_support_vectors"] > 0
     assert set(architecture["clustering"]) == {"stress", "fatigue"}
     assert "values" in runner.describe_architecture(include_values=True)["autoencoder"]["layers"][0]["weight"]
+
+
+def test_全パラメータに日本語の説明がある():
+    from scenarios.scenario_loader import DEFAULT_PARAMS_PATHS, load_parameter_descriptions
+    descriptions = load_parameter_descriptions()
+    for model, path in DEFAULT_PARAMS_PATHS.items():
+        # 既定JSONのキーと、説明のキーが一致する(パラメータを足したら、説明も足す)
+        assert set(descriptions[model]["parameters"]) == set(load_json(path)), model
+        assert descriptions[model]["model"]["label"] and descriptions[model]["model"]["description"]
+        for item in descriptions[model]["parameters"].values():
+            assert item["label"].strip() and item["description"].strip()

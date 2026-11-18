@@ -10,11 +10,12 @@
     {"name": "get_scenario_architecture", "method": "GET", "path": "/api/scenarios/{name}/architecture", "handler_file": "get-scenario-architecture.py", "mode": "any", "description": "学習済みシナリオの、層ごとの構成とパラメータ量を返す"},
     {"name": "get_scenario_parameters", "method": "GET", "path": "/api/scenarios/{name}/parameters", "handler_file": "get-scenario-parameters.py", "mode": "any", "description": "シナリオで使われる全パラメータ(既定値+シナリオの上書き)を返す"},
 
-    {"name": "post_train", "method": "POST", "path": "/api/train", "handler_file": "post-train.py", "mode": "train", "status_code": 202, "description": "全データでシナリオを学習し、予測用モデルを保存する(別スレッドで実行)"},
+    {"name": "post_train", "method": "POST", "path": "/api/train", "handler_file": "post-train.py", "mode": "train", "status_code": 202, "description": "データの7割でシナリオを学習し(残り3割で評価)、予測用モデルを保存する(別スレッドで実行)"},
     {"name": "post_compare", "method": "POST", "path": "/api/compare", "handler_file": "post-compare.py", "mode": "train", "status_code": 202, "description": "全シナリオを同じデータで学習・評価して比べる(別スレッドで実行)"},
     {"name": "get_compare_result", "method": "GET", "path": "/api/compare/result", "handler_file": "get-compare-result.py", "mode": "any", "description": "直近のシナリオ比較の結果を返す"},
     {"name": "get_current_job", "method": "GET", "path": "/api/jobs/current", "handler_file": "get-current-job.py", "mode": "any", "description": "実行中(または直近)の処理の進捗と、エポックごとの損失を返す"},
 
+    {"name": "get_parameter_descriptions", "method": "GET", "path": "/api/parameter-descriptions", "handler_file": "get-parameter-descriptions.py", "mode": "any", "description": "モデルごとの、パラメータの日本語名と説明を返す"},
     {"name": "get_evaluation_plans", "method": "GET", "path": "/api/evaluation-plans", "handler_file": "get-evaluation-plans.py", "mode": "any", "description": "選べる評価計画(k交差検証・holdoutなど)の一覧を返す"},
     {"name": "post_experiment_run", "method": "POST", "path": "/api/experiments/run", "handler_file": "post-experiment-run.py", "mode": "train", "description": "シナリオ・評価計画・パラメータで評価して記録する。実行済みなら実行せず、過去の記録を返す(force で再実行)"},
     {"name": "get_experiment_records", "method": "GET", "path": "/api/experiments/records", "handler_file": "get-experiment-records.py", "mode": "any", "description": "実験の記録を、新しい順に一覧する"},
